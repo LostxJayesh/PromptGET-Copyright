@@ -41,13 +41,22 @@ let customWmY = 0;
 let isDraggingWm = false;
 let dpr = window.devicePixelRatio || 1;
 
+// Preload fonts to prevent canvas text from starting with a fallback font
+// and automatically changing when a setting is updated or exported.
+document.fonts.load('bold 48px "Comic Neue"').then(() => {
+    if (originalImage) drawCanvas();
+});
+document.fonts.load('bold 48px "Comic Sans MS"').then(() => {
+    if (originalImage) drawCanvas();
+});
+
 // Initialize Theme
 function toggleTheme() {
     const html = document.documentElement;
     const currentTheme = html.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', newTheme);
-    
+
     if (newTheme === 'dark') {
         moonIcon.style.display = 'block';
         sunIcon.style.display = 'none';
@@ -100,22 +109,22 @@ function handleFile(file) {
             originalImage = img;
             currentImageWidth = img.width;
             currentImageHeight = img.height;
-            
+
             // Set input values
             widthInput.value = img.width;
             heightInput.value = img.height;
             widthInput.disabled = false;
             heightInput.disabled = false;
             scaleSelect.value = "100";
-            
+
             // Center custom watermark initially
             customWmX = currentImageWidth / 2;
             customWmY = currentImageHeight / 2;
-            
+
             // Switch UI views
             uploadArea.style.display = 'none';
             canvasContainer.style.display = 'flex';
-            
+
             drawCanvas();
         };
         img.src = e.target.result;
@@ -209,7 +218,7 @@ function drawCanvas() {
     // Set canvas logical size to the requested resized dimensions
     canvas.width = currentImageWidth * dpr;
     canvas.height = currentImageHeight * dpr;
-    
+
     // Set presentation size (handled via CSS max-width/max-height, 
     // but giving explicit aspect ratio helps the browser)
     canvas.style.aspectRatio = `${currentImageWidth} / ${currentImageHeight}`;
@@ -224,7 +233,7 @@ function drawCanvas() {
 
     // Draw Watermark
     drawWatermark();
-    
+
     ctx.restore();
 }
 
@@ -241,11 +250,11 @@ function drawWatermark() {
     ctx.font = `bold ${size}px "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
-    
+
     // Measure text for positioning algorithms
     const metrics = ctx.measureText(text);
     // Rough estimate of height since measureText height isn't fully reliable in all browsers
-    const th = size; 
+    const th = size;
     const tw = metrics.width;
 
     let x = 0;
@@ -321,7 +330,7 @@ function getMousePos(evt) {
 canvas.addEventListener('mousedown', (e) => {
     if (wmPosition.value !== 'custom') return;
     const pos = getMousePos(e);
-    
+
     // Roughly check if mouse is near text.
     // Text is drawn centered at customWmX, customWmY.
     const size = parseInt(wmSize.value);
@@ -332,8 +341,8 @@ canvas.addEventListener('mousedown', (e) => {
 
     // Simple AABB collision (does not account for rotation for simplicity of picking)
     const padding = 20;
-    if (pos.x >= customWmX - tw/2 - padding && pos.x <= customWmX + tw/2 + padding &&
-        pos.y >= customWmY - th/2 - padding && pos.y <= customWmY + th/2 + padding) {
+    if (pos.x >= customWmX - tw / 2 - padding && pos.x <= customWmX + tw / 2 + padding &&
+        pos.y >= customWmY - th / 2 - padding && pos.y <= customWmY + th / 2 + padding) {
         isDraggingWm = true;
         canvas.style.cursor = 'grabbing';
     }
@@ -367,8 +376,8 @@ canvas.addEventListener('touchstart', (e) => {
     const tw = ctx.measureText("© PromptGet").width;
     const th = size;
     const padding = 30; // larger hit area for touch
-    if (pos.x >= customWmX - tw/2 - padding && pos.x <= customWmX + tw/2 + padding &&
-        pos.y >= customWmY - th/2 - padding && pos.y <= customWmY + th/2 + padding) {
+    if (pos.x >= customWmX - tw / 2 - padding && pos.x <= customWmX + tw / 2 + padding &&
+        pos.y >= customWmY - th / 2 - padding && pos.y <= customWmY + th / 2 + padding) {
         isDraggingWm = true;
         e.preventDefault(); // prevent scrolling while dragging watermark
     }
@@ -392,7 +401,7 @@ window.addEventListener('touchend', () => {
 // Export Logic
 function downloadImage(format) {
     if (!originalImage) return;
-    
+
     // Temporarily hide the dashed outline for custom position during download
     const currentMode = wmPosition.value;
     let wasCustom = false;
@@ -401,7 +410,7 @@ function downloadImage(format) {
         wmPosition.value = 'center'; // temp non-custom so dashed box isn't drawn
         drawCanvas();
         // Restore custom position state coordinates but keep dashed line disabled for the render
-        wmPosition.value = 'custom'; 
+        wmPosition.value = 'custom';
     }
 
     // To cleanly download without UI artifacts (like dashed bounding box limit), we render to a clean memory canvas 
@@ -427,7 +436,7 @@ function downloadImage(format) {
     exCtx.font = `bold ${size}px "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
     exCtx.textBaseline = "middle";
     exCtx.textAlign = "center";
-    
+
     let x = 0, y = 0;
     const tw = exCtx.measureText("© PromptGet").width;
     const th = size;
@@ -471,7 +480,7 @@ function downloadImage(format) {
 
     // Export Data URL
     const dataUrl = exportCanvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.92 : undefined);
-    
+
     // Create link and trigger download
     const link = document.createElement('a');
     link.download = `watermarked_PromptGet_${Date.now()}.${format === 'jpeg' ? 'jpg' : 'png'}`;
