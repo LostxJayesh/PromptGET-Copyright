@@ -43,10 +43,7 @@ let dpr = window.devicePixelRatio || 1;
 
 // Preload fonts to prevent canvas text from starting with a fallback font
 // and automatically changing when a setting is updated or exported.
-document.fonts.load('bold 48px "Comic Neue"').then(() => {
-    if (originalImage) drawCanvas();
-});
-document.fonts.load('bold 48px "Comic Sans MS"').then(() => {
+document.fonts.load('48px "Komika Axis"').then(() => {
     if (originalImage) drawCanvas();
 });
 
@@ -247,7 +244,7 @@ function drawWatermark() {
     const pos = wmPosition.value;
 
     ctx.globalAlpha = opacity;
-    ctx.font = `bold ${size}px "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
+    ctx.font = `${size}px "Komika Axis", "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
 
@@ -334,7 +331,7 @@ canvas.addEventListener('mousedown', (e) => {
     // Roughly check if mouse is near text.
     // Text is drawn centered at customWmX, customWmY.
     const size = parseInt(wmSize.value);
-    ctx.font = `bold ${size}px "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
+    ctx.font = `${size}px "Komika Axis", "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
     const metrics = ctx.measureText("© PromptGet");
     const tw = metrics.width;
     const th = size;
@@ -372,7 +369,7 @@ canvas.addEventListener('touchstart', (e) => {
     const pos = getMousePos(touch);
     // (Collision logic duplicated from mousedown)
     const size = parseInt(wmSize.value);
-    ctx.font = `bold ${size}px "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
+    ctx.font = `${size}px "Komika Axis", "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
     const tw = ctx.measureText("© PromptGet").width;
     const th = size;
     const padding = 30; // larger hit area for touch
@@ -433,7 +430,7 @@ function downloadImage(format) {
     const hasShadow = wmShadow.checked;
 
     exCtx.globalAlpha = opacity;
-    exCtx.font = `bold ${size}px "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
+    exCtx.font = `${size}px "Komika Axis", "Comic Sans MS", "Comic Neue", cursive, sans-serif`;
     exCtx.textBaseline = "middle";
     exCtx.textAlign = "center";
 
